@@ -81,10 +81,12 @@ def update_pilot_info():
     out_df = pd.concat(out)
     out_df.drop_duplicates()
 
-    out_df['diff'] = (out_df['time_stamp'].iloc[-1]
-                      - out_df['time_stamp']).dt.total_seconds()
-    out_df = out_df[out_df['diff'] <= PERSIST_TIME]
-
+    if len(out_df.index) > 1:
+        out_df['diff'] = (out_df['time_stamp'].iloc[-1]
+                          - out_df['time_stamp']).dt.total_seconds()
+        out_df = out_df[out_df['diff'] <= PERSIST_TIME]
+    else:
+        out_df['diff'] = 0
     out_df['min_dist'] = out_df.groupby(['email']).norm_dist.transform('min')
 
     out_df['Name'] = out_df['firstName'] + ' ' + out_df['lastName']
